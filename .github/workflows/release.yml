@@ -1,0 +1,54 @@
+name: release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Sync version tag with changelog
+        id: sync
+        run: |
+          set -euo pipefail
+          version="$(sed -nE 's/^## ([0-9]+\.[0-9]+\.[0-9]+).*/\1/p' docs/changelog.md | head -n1)"
+          [[ -n "$version" ]] || { echo "error: no version heading in docs/changelog.md" >&2; exit 1; }
+          meta="$(sed -nE 's/^  version: "([^"]+)"/\1/p' SKILL.md | head -n1)"
+          [[ "$meta" == "$version" ]] || { echo "error: changelog=$version vs metadata.version=$meta" >&2; exit 1; }
+          tag="v$version"
+          if git rev-parse --verify --quiet "refs/tags/$tag" >/dev/null; then
+            echo "ok: tag $tag already exists"
+          else
+            git tag -a "$tag" -m "Release $version"
+            git push origin "refs/tags/$tag"
+            echo "created and pushed $tag"
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${{ steps.sync.outputs.tag }}"
+          version="${{ steps.sync.outputs.version }}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "release $tag already exists — skipping"
+          else
+            gh release create "$tag" \
+              --title "Release $version" \
+              --notes "See [changelog](docs/changelog.md) and [iteration detail](docs/iterations/$version.md)."
+          fi
