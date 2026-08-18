@@ -1,21 +1,26 @@
 # .agents protocol checklist (dotagentsprotocol.com)
 
-Source: https://dotagentsprotocol.com/ — DRAFT standard. A directory
-convention that *converges* other standards; each sub-standard keeps its own
-specification.
+Source: https://dotagentsprotocol.com/ — DRAFT standard (2026-02-24). A
+directory convention that *converges* other standards; each sub-standard keeps
+its own specification. The protocol also has a sharing catalog, the
+[.agents Hub](https://hub.dotagentsprotocol.com), for installable bundle
+artifacts.
 
 ## Layout (workspace `./.agents/`)
 
 ```
 .agents/
-├── agents.md          # instructions (AGENTS.md-compatible)
-├── system-prompt.md   # system prompt
-├── mcp.json           # MCP server configuration
-├── models.json        # model presets & provider keys
-├── skills/<name>/     # Agent Skills (format governed by agentskills.io)
-├── agents/<name>/     # sub-agent profiles (agent.md: frontmatter + system prompt)
-├── tasks/<name>/      # repeat task definitions (task.md)
-└── memories/*.md      # persistent knowledge entries
+├── agents.md              # instructions (AGENTS.md-compatible)
+├── system-prompt.md       # system prompt
+├── mcp.json               # MCP server configuration
+├── models.json            # model presets & provider keys
+├── speakmcp-settings.json # general settings
+├── layouts/               # UI/layout preferences
+├── skills/<name>/         # Agent Skills (format governed by agentskills.io)
+├── agents/<name>/         # sub-agent profiles (agent.md: frontmatter + system prompt)
+├── tasks/<name>/          # repeat task definitions (task.md)
+├── memories/*.md          # persistent knowledge entries
+└── .backups/              # auto-rotated backups
 ```
 
 All entries optional; adopt incrementally. Unknown directories are outside the
@@ -29,12 +34,17 @@ protocol — map them into the layout above or justify them explicitly.
 
 ## Memory entry format
 
+Frontmatter is simple `key: value` lines — **not full YAML**, no external
+dependencies. Values can be quoted; list fields accept CSV (`tags: a, b, c`) or
+JSON arrays (`tags: ["a", "b"]`).
+
 ```markdown
 ---
 id: arch_001
 title: Database Architecture
+content: PostgreSQL with Drizzle ORM
 importance: high
-tags: database, architecture
+tags: database, architecture, orm
 ---
 Body text of the memory.
 ```
@@ -54,4 +64,4 @@ Body text of the memory.
 2. Any non-protocol directories under `.agents/`? Propose a mapping — but
    respect scope: full project documents belong in root `docs/`, app resources
    in `assets/`; only distilled facts become `memories/` entries.
-3. Do memory entries carry `id`/`title`/`importance`/`tags` frontmatter?
+3. Do memory entries carry `id`/`title`/`content`/`importance`/`tags` frontmatter?

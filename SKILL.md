@@ -3,8 +3,8 @@ name: doc-standards
 description: Apply and audit this project's documentation standards, which combine three specs — AGENTS.md (agents.md), the .agents directory protocol (dotagentsprotocol.com), and the Agent Skills spec (agentskills.io). Use when creating, moving, or editing AGENTS.md, README.md, SKILL.md, skills, memories, or any file under .agents/, when distributing or installing a skill (e.g. npx skills add), and when auditing the repo's docs for compliance.
 metadata:
   sources: "https://agents.md/ | https://dotagentsprotocol.com/ | https://agentskills.io/specification"
-  spec-snapshot: "2026-07"
-  version: "1.0.0"
+  spec-snapshot: "2026-08"
+  version: "1.0.1"
 ---
 
 # Documentation Standards
